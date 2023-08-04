@@ -25,7 +25,6 @@ def extract():
 
     try:
         endpoint_url = base64.b64decode(os.getenv("endpoint_url")).decode('utf-8')
-        print(endpoint_url)
         sqs = boto3.client('sqs', endpoint_url=endpoint_url, region_name = 'us-east-1')
         response = sqs.receive_message(QueueUrl=endpoint_url)
         messages_list = []
@@ -115,7 +114,6 @@ if __name__ == '__main__':
     try:
         log.info("establishing the connection")
         connection_string = base64.b64decode(os.getenv("connection_string")).decode('utf-8')
-        print(connection_string)
         conn = create_engine('postgresql+psycopg2://postgres:postgres@localhost:5432/postgres').connect()
         log.info("DB connection established")
         # call extract method to retrieve messages
