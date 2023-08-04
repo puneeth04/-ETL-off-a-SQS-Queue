@@ -3,8 +3,14 @@ import pandas as pd
 import json
 import logging as log
 import base64
+import os
+import warnings
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from datetime import datetime
+
+load_dotenv('./.env')
+warnings.filterwarnings('ignore')
 
 log.basicConfig(level=log.INFO,
                     format='%(asctime)s - %(levelname)s - %(message)s')
@@ -16,10 +22,12 @@ def extract():
     extract the body of the message and
     return list of messages as output
     """
-    endpoint_url = 'http://localhost:4566/000000000000/login-queue'
+
     try:
-        sqs = boto3.client('sqs', endpoint_url = endpoint_url, region_name = 'us-east-1')
-        response = sqs.receive_message(QueueUrl='http://localhost:4566/000000000000/login-queue')
+        endpoint_url = base64.b64decode(os.getenv("endpoint_url")).decode('utf-8')
+        print(endpoint_url)
+        sqs = boto3.client('sqs', endpoint_url=endpoint_url, region_name = 'us-east-1')
+        response = sqs.receive_message(QueueUrl=endpoint_url)
         messages_list = []
         if 'Messages' in response:
             for message in response['Messages']:
@@ -71,7 +79,7 @@ def load_message(transform_df,conn):
     postgres table 'user_logins'
     """
     try:
-        log.info("loaded df into table")  
+        log.info("loading df into table")  
         transform_df.to_sql('user_logins', conn, if_exists='append', index=False)
         log.info("data loaded into table successfully")  
     except Exception as e:
@@ -106,8 +114,10 @@ def retrieve_messages(conn):
 if __name__ == '__main__':
     try:
         log.info("establishing the connection")
+        connection_string = base64.b64decode(os.getenv("connection_string")).decode('utf-8')
+        print(connection_string)
         conn = create_engine('postgresql+psycopg2://postgres:postgres@localhost:5432/postgres').connect()
-        log.info("DB connection established and loading data into table from dataframe")
+        log.info("DB connection established")
         # call extract method to retrieve messages
         received_messages = extract()
         # perform validations - if no messages received then skip the transformation and loading
@@ -120,7 +130,7 @@ if __name__ == '__main__':
             log.info("No messages to transform")
         
         # Additional function to retrieve original values for masked columns
-        # retrieve_messages(conn)
+        df = retrieve_messages(conn)
     except Exception as e:
         log.error("Error occured in main function:%s ",e)
     finally:

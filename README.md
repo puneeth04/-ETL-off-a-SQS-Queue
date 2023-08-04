@@ -1,4 +1,4 @@
-# -ETL-off-a-SQS-Queue
+# ETL-off-a-SQS-Queue
 
 This application will read messages from SQS queue, transform the data 
 and load to postgres DB.
