@@ -128,7 +128,7 @@ if __name__ == '__main__':
             log.info("No messages to transform")
         
         # Additional function to retrieve original values for masked columns
-        df = retrieve_messages(conn)
+        # df = retrieve_messages(conn)
     except Exception as e:
         log.error("Error occured in main function:%s ",e)
     finally:
