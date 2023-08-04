@@ -43,10 +43,10 @@ make run
 
 ### How can this application scale with a growing dataset?
     We can leverage event driven processesing using AWS Lambda and attaching SQS as a trigger or
-    We can use AWS Kinesis which collects the messages from sqs and trigger the lambda.
+    We can also use AWS Kinesis which collects the messages from sqs and trigger the lambda.
     Lambda can run asynchronously based on the events by setting the concurrency limit.
 ### How can PII be recovered later on?
-    We can use the 'retrieve_messages' method in the script to retrieve the data from Postgres and in the method we decoded the values of the 'PII' columns.
+    I have written 'retrieve_messages' method in the script to retrieve the data from Postgres and in the method which decodes the values of the 'PII' columns to original values.
 
 ### What are the assumptions you made?
     Assumptions:
